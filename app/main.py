@@ -64,7 +64,7 @@ def font(size, bold=False):
 
 def wrap(draw, text, width, face):
     lines, line = [], ""
-    for word in re.sub(r"\\s+", " ", str(text).strip()).split():
+    for word in re.sub(r"\s+", " ", str(text).strip()).split():
         candidate = (line + " " + word).strip()
         if draw.textbbox((0, 0), candidate, font=face)[2] <= width:
             line = candidate
@@ -157,12 +157,12 @@ def main():
         raise RuntimeError("Existing unfinished daily record; inspect Buffer before retrying.")
     content = make_content(day)
     poster(content, img, day)
-    caption = str(content["caption"]).strip() + "\\n\\n" + " ".join(content["hashtags"])
+    caption = str(content["caption"]).strip() + "\n\n" + " ".join(content["hashtags"])
     record = {"date": day.isoformat(), "content": content, "status": "generated"}
     receipt.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
     if os.getenv("ENABLE_PUBLISH", "false").lower() != "true":
         print("DRY RUN: no image uploaded or post queued.")
-        print("Caption preview:\\n" + caption)
+        print("Caption preview:\n" + caption)
         print("Image generated at:", img)
         return
     repo = required("GITHUB_REPOSITORY")
