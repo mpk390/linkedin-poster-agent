@@ -1,0 +1,32 @@
+name: Daily LinkedIn Poster
+on:
+  schedule:
+    - cron: '15 16 * * *'
+      timezone: Asia/Kolkata
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: linkedin-poster
+  cancel-in-progress: false
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Generate poster and (if enabled) queue Buffer post
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          BUFFER_API_KEY: ${{ secrets.BUFFER_API_KEY }}
+          BUFFER_CHANNEL_ID: ${{ vars.BUFFER_CHANNEL_ID }}
+          ENABLE_PUBLISH: ${{ vars.ENABLE_PUBLISH }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          POSTER_BRAND: ${{ vars.POSTER_BRAND }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python app/main.py
